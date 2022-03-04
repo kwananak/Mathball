@@ -1,5 +1,6 @@
 import patow as pt
 import time
+import interface as it
 import turtle as tt
 
 def coup(force):
@@ -32,6 +33,8 @@ def coup(force):
         else:
           score_bot += 1
         print(f'{frappeur} à fait marquer {troisieme[1][0]}!')
+        it.title.clear()
+        it.title.write(f'{score_top} - {score_bot}', False, 'center', ('Courier', 100, 'bold'))
       troisieme[1] = deuxieme[1]
       deuxieme[1] = premier[1]
       premier[1] = marbre[1]
@@ -73,6 +76,8 @@ def role_champ():
       premier[0] = int(input('numéro du premier but: '))
       deuxieme[0] = int(input('numéro du deuxième but: '))
       troisieme[0] = int(input('numéro du troisième but: '))
+
+
 
 #input_baton
 #input_champ
@@ -124,21 +129,16 @@ time.sleep(1)
 print('  ')
 print('  ')
 print('Combien de manches?')
-while True:
-  try:
-    qt_manches = int(input('       '))
-  except ValueError:
-    time.sleep(0.1)
-  time.sleep(0.3)
-  if qt_manches  == 1:
-      print(f'   Une manche!!!')
-      break
-  if qt_manches in range(2, 10):
-      print(f'   {qt_manches} manches!!')
-      break
-  else:
-    print('De une à neuf manche')
-    time.sleep(0.3)
+
+it.arb_pers.showturtle()
+qt_manches = tt.numinput('Manches','Combien de manches?', 1, 1, 9)
+
+if qt_manches  == 1:
+  it.arb_di.write('Une seule manche!', False, 'right', ('Courier', 20, 'bold'))
+else:
+  it.arb_di.write('Une seule manche!', False, 'right', ('Courier', 20, 'bold'))
+time.sleep(2)
+it.arb_di.clear()
 
 while manche <= qt_manches:
   if top_bot:
