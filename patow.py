@@ -1,5 +1,8 @@
 import random
 import time
+import interface as it
+import turtle as tt
+
 
 prise = 0
 baseball = True
@@ -16,23 +19,19 @@ def force():
     while baseball:
         lancer = [0, 0]
 
-        choix = ''
-        print('Choix de lancer:')
-        while True:
-            choix = input('       ')
-            if choix in ('bas', 'haut'):
-                break
-            else:
-                print('bas ou haut')
+        it.lan_bas.showturtle()
+        it.lan_haut.showturtle()
+        it.arb_di.write('Choix de lancer', False, 'right', ('Courier', 15, 'bold'))
+        time.sleep(5)
+        it.arb_di.clear()
 
-
-
-        time.sleep(0.3)
-        if choix == 'bas':
+        if it.choix == 1:
             n = random.randint(1, 10)
             if n == 1:
                 # m = random.randint(1,5)
-                print(balles_basses[0][0])
+                it.arb_di.write(balles_basses[0][0], False, 'right', ('Courier', 15, 'bold'))
+                time.sleep(2)
+                it.arb_di.clear()
                 lancer = balles_basses[0][1:]
             else:
                 lancer = [1, 1]
@@ -40,7 +39,9 @@ def force():
             n = random.randint(1, 10)
             if n == 1:
                 # m = random.randint(1,5)
-                print(balles_hautes[0][0])
+                it.arb_di.write(balles_hautes[0][0], False, 'right', ('Courier', 15, 'bold'))
+                time.sleep(2)
+                it.arb_di.clear()
                 lancer = balles_hautes[0][1:]
             else:
                 lancer = [2, 2]
@@ -59,15 +60,7 @@ def force():
             b = random.randint(6, 9)
         #print(a, b)
 
-        frappe = 'n'
-        print(f'{str(a)} * {str(b)} = ')
-        while True:
-            try:
-                frappe = input('       ')
-            except ValueError:
-                time.sleep(0.2)
-            if frappe.isdigit():
-                break
+        frappe = tt.numinput('Lancer!', f'{str(a)} * {str(b)} = ')
 
         reponse = a * b
         if reponse == int(frappe):
@@ -77,11 +70,13 @@ def force():
             time.sleep(0.3)
             prise += 1
         if prise == 1:
-            print('Première prise')
-            print('  ')
+            it.arb_di.write('Première prise', False, 'right', ('Courier', 15, 'bold'))
+            time.sleep(2)
+            it.arb_di.clear()
         if prise == 2:
-            print('Deuxième prise')
-            print(' ')
+            it.arb_di.write('Deuxième prise', False, 'right', ('Courier', 15, 'bold'))
+            time.sleep(2)
+            it.arb_di.clear()
             # mode 2 prises pour tests
             return 0
         if prise == 3:

@@ -15,15 +15,30 @@ def coup(force):
 
   if force == 0:
     retrait += 1
-    print(f' {frappeur} est retiré!')
+    it.title.clear()
+    it.title.write(f' {frappeur} est retiré!', False, 'center', ('Courier', 100, 'bold'))
+    it.title.clear()
+    it.title.write(f'{score_top} - {score_bot}', False, 'center', ('Courier', 100, 'bold'))
   if force == 1:
-    print('    Coup sûr!')
+    it.title.clear()
+    it.title.write('Coup sûr!', False, 'center', ('Courier', 100, 'bold'))
+    it.title.clear()
+    it.title.write(f'{score_top} - {score_bot}', False, 'center', ('Courier', 100, 'bold'))
   if force == 2:
-    print('    DDouble!!')
+    it.title.clear()
+    it.title.write('DDouble!!', False, 'center', ('Courier', 100, 'bold'))
+    it.title.clear()
+    it.title.write(f'{score_top} - {score_bot}', False, 'center', ('Courier', 100, 'bold'))
   if force == 3:
-    print('    TTTriple!!!')
+    it.title.clear()
+    it.title.write('TTTriple!!!', False, 'center', ('Courier', 100, 'bold'))
+    it.title.clear()
+    it.title.write(f'{score_top} - {score_bot}', False, 'center', ('Courier', 100, 'bold'))
   if force == 4:
-    print('!♥!COUP DE CIRCUIT!♥!')
+    it.title.clear()
+    it.title.write('!♥!COUP DE CIRCUIT!♥!', False, 'center', ('Courier', 100, 'bold'))
+    it.title.clear()
+    it.title.write(f'{score_top} - {score_bot}', False, 'center', ('Courier', 100, 'bold'))
 
   else:
     for i in range(force):
@@ -126,19 +141,21 @@ print('║ ╠══╣ ║ ╔╗ ║ ║ ║ ║ ╔═╗ ║ ╚╝ ║ ╔�
 print('╚═╝  ╚═╩═╝╚═╝ ╚═╝ ╚═╝ ╚═╩════╩═╝╚═╩═══╩═══╝')
 
 time.sleep(1)
-print('  ')
-print('  ')
-print('Combien de manches?')
 
 it.arb_pers.showturtle()
-qt_manches = tt.numinput('Manches','Combien de manches?', 1, 1, 9)
+qt_manches = int(tt.numinput('Manches','Combien de manches?', 1, 1, 9))
 
 if qt_manches  == 1:
-  it.arb_di.write('Une seule manche!', False, 'right', ('Courier', 20, 'bold'))
+  it.arb_di.write('Une seule manche!', False, 'right', ('Courier', 15, 'bold'))
 else:
-  it.arb_di.write('Une seule manche!', False, 'right', ('Courier', 20, 'bold'))
+  it.arb_di.write(f'{qt_manches} manches!', False, 'right', ('Courier', 15, 'bold'))
 time.sleep(2)
 it.arb_di.clear()
+time.sleep(0.5)
+it.title.clear()
+time.sleep(1)
+it.title.write('0 - 0', False, 'center', ('Courier', 100, 'bold'))
+time.sleep(1)
 
 while manche <= qt_manches:
   if top_bot:
@@ -160,9 +177,10 @@ while manche <= qt_manches:
       nm_manche = 'la quatrième'
     if manche == 5:
       nm_manche = 'la cinquième'
-  time.sleep(0.4)
-  print('  ')
-  print(f'{stat_manche} de {nm_manche} manche')
+
+  it.arb_di.write(f'{stat_manche} de {nm_manche} manche', False, 'right', ('Courier', 15, 'bold'))
+  time.sleep(1.5)
+  it.arb_di.clear()
 
   if top_bot:
     nom_baton, *au_baton = equipe_top
@@ -170,16 +188,15 @@ while manche <= qt_manches:
   else:
     nom_baton, *au_baton = equipe_bot
     nom_champ, *au_champ = equipe_top
-  print(f'{nom_baton} sont au bâton')
+
+  it.arb_di.write(f'{nom_baton} sont au bâton', False, 'right', ('Courier', 15, 'bold'))
+  time.sleep(1.5)
+  it.arb_di.clear()
 
   # role_champ()
 
   print('## mode 2 prises & 2 retraits pour tests ##')
-  while retrait < 1:
-
-    time.sleep(0.7)
-    print('  ')
-    print(f'{str(score_top)} à {str(score_bot)}')
+  while retrait < 2:
     if premier[1] != []:
       print(f'{premier[1][0]} est au premier')
     if deuxieme[1] != []:
@@ -187,13 +204,17 @@ while manche <= qt_manches:
     if troisieme[1] != []:
       print(f'{troisieme[1][0]} est au troisième')
     if retrait == 0:
-      print('Aucun retrait')
+      it.arb_di.write('Aucun retrait', False, 'right', ('Courier', 15, 'bold'))
+      time.sleep(1.5)
+      it.arb_di.clear()
     if retrait == 1:
-      print('Un retrait')
+      it.arb_di.write('Un retrait', False, 'right', ('Courier', 15, 'bold'))
+      time.sleep(1.5)
+      it.arb_di.clear()
     if retrait == 2:
-      print('Deux retraits')
-    print('  ')
-    time.sleep(0.5)
+      it.arb_di.write('Deux retraits', False, 'right', ('Courier', 15, 'bold'))
+      time.sleep(1.5)
+      it.arb_di.clear()
 
     marbre[1] = au_baton[0]
     coup(pt.force())
@@ -201,9 +222,13 @@ while manche <= qt_manches:
 
     if retrait == 3:
       if top_bot:
-        print('Troisième retrait! Changement de bord!')
+        it.arb_di.write('Troisième retrait! Changement de bord!', False, 'right', ('Courier', 15, 'bold'))
+        time.sleep(2)
+        it.arb_di.clear()
       else:
-        print('Troisième retrait! Fin de la manche!')
+        it.arb_di.write('Troisième retrait! Fin de la manche!', False, 'right', ('Courier', 15, 'bold'))
+        time.sleep(2)
+        it.arb_di.clear()
 
   retrait = 0
   marbre = [[], []]
