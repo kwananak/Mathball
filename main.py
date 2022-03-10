@@ -60,18 +60,12 @@ class partie:
         self.prise += 1
         if self.prise == 1:
             arbi.w("Première prise")
-            time.sleep(1)
-            arbi.dial.clear()
             presence_bat()
         if self.prise == 2:
             arbi.w("Deuxième prise!")
-            time.sleep(1)
-            arbi.dial.clear()
             presence_bat()
         if self.prise == 3:
             arbi.w("Troisième prise!!")
-            time.sleep(1)
-            arbi.dial.clear()
             self.up_retrait()
 
 
@@ -79,18 +73,12 @@ class partie:
         self.retrait += 1
         self.prise = 0
         arbi.w(f'{marbre.baton[0]} est retiré!')
-        time.sleep(1)
-        arbi.dial.clear()
         if self.retrait == 3:
             self.retrait = 0
             if self.top_bot:
                 arbi.w("3ème retrait! Changement de bord!")
-                time.sleep(1)
-                arbi.dial.clear()
             else:
                 arbi.w("3ème retrait! Fin de la manche!")
-                time.sleep(1)
-                arbi.dial.clear()
             self.resultat_manche()
         else:
             resultat_presence(0)
@@ -173,21 +161,23 @@ class arbitre:
         self.pers.ht()
         self.pers.penup()
         self.pers.speed(9)
-        self.pers.shape('triangle')
-        self.pers.color('white')
-        self.pers.setpos(-80, 130)
-        self.pers.shapesize(stretch_wid=3, stretch_len=3)
+        self.pers.shape('arbi1.gif')
+        self.pers.setpos(60, 220)
+        self.pers.shapesize(stretch_wid=10, stretch_len=10)
 
         self.dial = turtle.Turtle()
         self.dial.ht()
         self.dial.penup()
         self.dial.speed(9)
         self.dial.color('white')
-        self.dial.setpos(-100, 170)
+        self.dial.setpos(35, 240)
 
     def w(self, a):
-        self.dial.clear()
+        self.pers.shape('arbi2.gif')
         self.dial.write(a, False, 'right', ('Courier', 15, 'bold'))
+        time.sleep(1)
+        self.pers.shape('arbi1.gif')
+        self.dial.clear()
 
 
 class jumbotron:
@@ -196,7 +186,7 @@ class jumbotron:
         self.tt.ht()
         self.tt.penup()
         self.tt.color('white')
-        self.tt.setpos(0, 220)
+        self.tt.setpos(0, 270)
 
     def w(self, a):
         self.tt.clear()
@@ -213,16 +203,16 @@ def intro():
     marbre.turtle.speed(3)
     marbre.turtle.pensize(6)
     marbre.turtle.pendown()
-    marbre.turtle.setpos(-200, -50)
+    marbre.turtle.setpos(premier.x, premier.y)
     premier.turtle.st()
     time.sleep(0.5)
-    marbre.turtle.setpos(0, -250)
+    marbre.turtle.setpos(deuxieme.x, deuxieme.y)
     deuxieme.turtle.st()
     time.sleep(0.5)
-    marbre.turtle.setpos(200, -50)
+    marbre.turtle.setpos(troisieme.x, troisieme.y)
     troisieme.turtle.st()
     time.sleep(0.5)
-    marbre.turtle.setpos(0, 150)
+    marbre.turtle.setpos(0, 100)
 
     while True:
         ligne1.turtle.forward(6)
@@ -232,7 +222,9 @@ def intro():
 
     game.ecran.w('Mathball')
     time.sleep(1)
+    # monticule.turtle.st()
     btn_debut.tt.st()
+
 
 
 def nouv_part(x,y):
@@ -240,8 +232,6 @@ def nouv_part(x,y):
     arbi.pers.st()
     arbi.w('Combien de manches?')
     game.att_qt_manches()
-    arbi.dial.clear()
-    time.sleep(1)
     debut_partie()
 
 
@@ -250,8 +240,7 @@ def debut_partie():
         arbi.w('Une seule manche!')
     else:
         arbi.w(f'{int(game.qt_manches)} manches!')
-    time.sleep(2)
-    arbi.dial.clear()
+
     game.ecran.w(f"{game.score[0]} - {game.score[1]}")
 
     debut_manche()
@@ -280,8 +269,6 @@ def debut_manche():
             nm_manche = 'la cinquième'
 
     arbi.w(f'{stat_manche} de {nm_manche} manche')
-    time.sleep(1)
-    arbi.dial.clear()
 
     if game.top_bot:
         nom_baton = equipe_top.nom
@@ -290,11 +277,7 @@ def debut_manche():
         nom_baton = equipe_bot.nom
         liste_frappeurs = [equipe_bot.joueur1, equipe_bot.joueur2, equipe_bot.joueur3, equipe_bot.joueur4, equipe_bot.joueur5]
 
-
-
     arbi.w(f'{nom_baton} sont au bâton')
-    time.sleep(1.5)
-    arbi.dial.clear()
 
     presence_bat()
 
@@ -303,35 +286,22 @@ def presence_bat():
     marbre.changer_baton(liste_frappeurs[0])
     if premier.baton != ():
         arbi.w(f'{premier.baton[0]} est au premier')
-        time.sleep(1)
-        arbi.dial.clear()
     if deuxieme.baton != ():
         arbi.w(f'{deuxieme.baton[0]} est au deuxième')
-        time.sleep(1)
-        arbi.dial.clear()
     if troisieme.baton != ():
         arbi.w(f'{troisieme.baton[0]} est au troisième')
-        time.sleep(1)
-        arbi.dial.clear()
     if game.retrait == 0:
         arbi.w('Aucun retrait')
-        time.sleep(1.5)
-        arbi.dial.clear()
     if game.retrait == 1:
         arbi.w('Un retrait')
-        time.sleep(1)
-        arbi.dial.clear()
     if game.retrait == 2:
         arbi.w('Deux retraits')
-        time.sleep(1)
-        arbi.dial.clear()
     arbi.w('Choix de lancer')
     btn_fac.tt.st()
     btn_dif.tt.st()
 
 
 def choix_lancer(x, y):
-    arbi.dial.clear
     btn_fac.tt.ht()
     btn_dif.tt.ht()
 
@@ -339,8 +309,6 @@ def choix_lancer(x, y):
         n = random.randint(1, 6)
         if n == 1:
             arbi.w(balles_basses[0][0])
-            time.sleep(1)
-            arbi.dial.clear()
             pitch = balles_basses[0][1:]
         else:
             pitch = [1, 1]
@@ -348,8 +316,6 @@ def choix_lancer(x, y):
         n = random.randint(1, 6)
         if n == 1:
             arbi.w(balles_hautes[0][0])
-            time.sleep(1)
-            arbi.dial.clear()
             pitch = balles_hautes[0][1:]
         else:
             pitch = [2, 2]
@@ -384,8 +350,8 @@ def choix_lancer(x, y):
 #
 
 
-def frappe():
-    game.resultat_frappe()
+# def frappe():
+#     game.resultat_frappe()
 
 
 def resultat_presence(p):
@@ -422,8 +388,6 @@ def resultat_presence(p):
         if troisieme.baton != ():
             game.up_score()
             arbi.w(f"{frappeur} a fait marquer {troisieme.baton[0]}!")
-            time.sleep(1)
-            arbi.dial.clear()
         if deuxieme.baton == ():
             troisieme.clear_baton()
         else:
@@ -447,7 +411,14 @@ def resultat_presence(p):
 
 
 def resultat_partie():
-    print('partie finie')
+    arbi.w('Partie finie!')
+    if game.score[0] > game.score[1]:
+        arbi.w(f"{equipe_top.nom} ont gagnés!")
+    if game.score[0] < game.score[1]:
+        arbi.w(f"{equipe_bot.nom} ont gagnés!")
+    if game.score[0] > game.score[1]:
+        arbi.w("Partie nulle! Tout le monde perd!!")
+
 
 #######################################################
 
@@ -457,19 +428,29 @@ balles_hautes = [['Balle rapide!!', 3, 3]]
 equipe_top = equipe(True)
 equipe_bot = equipe(False)
 
-marbre = but(0, 150)
-premier = but(-200, -50)
-deuxieme = but(0, -250)
-troisieme = but(200, -50)
+wn = turtle.Screen()
+wn.addshape('arbi1.gif')
+wn.addshape('arbi2.gif')
+wn.addshape('jouer.gif')
+wn.bgcolor("#158000")
 
-ligne1 = ligne(45, 200, -50)
-ligne2 = ligne(135, -200, -50)
+marbre = but(0, 100)
+premier = but(-200, -100)
+deuxieme = but(0, -300)
+troisieme = but(200, -100)
+monticule = but(0, -100)
+monticule.turtle.shape("circle")
+monticule.turtle.color("#805500")
+monticule.turtle.shapesize(stretch_wid=9, stretch_len=9)
+
+ligne1 = ligne(45, 200, -100)
+ligne2 = ligne(135, -200, -100)
 
 game = partie()
-turtle.bgcolor('black')
-btn_debut = bouton(0,-50,3,6,0, nouv_part)
-btn_fac = bouton(-50,-30, 3, 5, 90, choix_lancer, 'arrow')
-btn_dif = bouton(50,-70, 3, 5, 270, choix_lancer, 'arrow')
+
+btn_debut = bouton(0,-100,2,4,0, nouv_part, "jouer.gif")
+btn_fac = bouton(-50,-80, 3, 5, 90, choix_lancer, 'arrow')
+btn_dif = bouton(50,-120, 3, 5, 270, choix_lancer, 'arrow')
 arbi = arbitre()
 intro()
 
