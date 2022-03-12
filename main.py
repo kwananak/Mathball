@@ -1,9 +1,15 @@
+# Tous droits réservés, copyright 2022 Dominic Daoust
+
+
 import turtle
 import time
 import random
 
 
+#transferer les if en match
+#check copyright
 #boutons pour inputs
+#envoyer joueurs au champ pour vrai
 #inputs simultanés
 #modèle joueurs
 #inputs val equipes/joueurs
@@ -11,18 +17,18 @@ import random
 #statistiques joueurs
 #incorporation web
 #timers sur input
-#réparer monticule?
 #liste des frappeurs = bancs des joueurs
+#affichage complet jumbotron
 
 
 class joueur:
+    all = []
     def __init__(self, nom, shape, num, x, y):
         self.tt = turtle.Turtle()
         self.tt.ht()
         self.tt.up()
         self.tt.shape(shape)
         self.tt.setpos(x, y)
-        self.tt.st()
 
         self.shape_init = shape
         self.banc = (x, y)
@@ -32,20 +38,21 @@ class joueur:
         self.num = num
         # self.numero = turtle.numinput(" ", "Numéro du joueur", 0, 1, 99)
 
+        joueur.all.append(self)
+
     def update_pos(self, x, y):
         self.tt.setpos(x, y)
-        print(self.tt.pos())
-        if x == -75 and y == 100.00:
-            print('yup')
-            self.tt.shape("bleu_baton.gif")
+        if x == -85 and y == 100:
+            if game.top_bot:
+                self.tt.shape("bleu_baton.gif")
+            else:
+                self.tt.shape("rouge_baton.gif")
         else:
-            print('nope')
             self.tt.shape(self.shape_init)
 
     def retour_banc(self):
         self.tt.shape(self.shape_init)
         self.tt.setpos(self.banc)
-
 
 
 class equipe:
@@ -122,13 +129,14 @@ class partie:
             resultat_presence(0)
 
     # def resultat_frappe(self):
-    #     if self.prise == 3:
-    #         self.resultat_presence()
-    #     else:
-    #         presence_bat
 
 
     def resultat_manche(self):
+        premier.clear_baton()
+        deuxieme.clear_baton()
+        troisieme.clear_baton()
+        for i in joueur.all:
+            i.retour_banc()
         if self.top_bot:
             self.top_bot = False
             debut_manche()
@@ -139,6 +147,9 @@ class partie:
                 resultat_partie()
             else:
                 debut_manche()
+
+    def reset_prise(self):
+        self.prise = 0
 
 
 class but:
@@ -231,7 +242,6 @@ class jumbotron:
         self.tt.write(a, False, 'center', ('System', 80, 'bold'))
 
 
-
 ##############################################
 
 
@@ -260,9 +270,7 @@ def intro():
 
     game.ecran.w('Mathball')
     time.sleep(1)
-    # monticule.turtle.st()
     btn_debut.tt.st()
-
 
 
 def nouv_part(x,y):
@@ -270,6 +278,11 @@ def nouv_part(x,y):
     wn.bgcolor("#288722")
     wn.bgpic("back.gif")
     arbi.pers.st()
+
+    for i in joueur.all:
+        i.tt.st()
+        time.sleep(0.1)
+
     arbi.w('Combien de manches?')
     game.att_qt_manches()
     debut_partie()
@@ -313,9 +326,31 @@ def debut_manche():
     if game.top_bot:
         nom_baton = equipe_top.nom
         liste_frappeurs = [equipe_top.joueur1, equipe_top.joueur5, equipe_top.joueur4, equipe_top.joueur3, equipe_top.joueur2]
+        equipe_bot.joueur1.update_pos(85, 100)
+        equipe_bot.joueur1.tt.shape("rouge_champ.gif")
+        equipe_bot.joueur2.update_pos(-115, -100)
+        equipe_bot.joueur2.tt.shape("rouge_champ.gif")
+        equipe_bot.joueur3.update_pos(85, -300)
+        equipe_bot.joueur3.tt.shape("rouge_champ.gif")
+        equipe_bot.joueur4.update_pos(285, -100)
+        equipe_bot.joueur4.tt.shape("rouge_champ.gif")
+        equipe_bot.joueur5.update_pos(0, -70)
+        equipe_bot.joueur5.tt.shape("rouge_champ.gif")
+
     else:
         nom_baton = equipe_bot.nom
         liste_frappeurs = [equipe_bot.joueur1, equipe_bot.joueur5, equipe_bot.joueur4, equipe_bot.joueur3, equipe_bot.joueur2]
+        equipe_top.joueur1.update_pos(85, 100)
+        equipe_top.joueur1.tt.shape("bleu_champ.gif")
+        equipe_top.joueur2.update_pos(-115, -100)
+        equipe_top.joueur2.tt.shape("bleu_champ.gif")
+        equipe_top.joueur3.update_pos(85, -300)
+        equipe_top.joueur3.tt.shape("bleu_champ.gif")
+        equipe_top.joueur4.update_pos(285, -100)
+        equipe_top.joueur4.tt.shape("bleu_champ.gif")
+        equipe_top.joueur5.update_pos(0, -70)
+        equipe_top.joueur5.tt.shape("bleu_champ.gif")
+
 
     arbi.w(f'{nom_baton} sont au bâton')
 
@@ -324,7 +359,7 @@ def debut_manche():
 
 def presence_bat():
     marbre.changer_baton(liste_frappeurs[0])
-    marbre.baton.update_pos(-75, 100)
+    marbre.baton.update_pos(-85, 100)
 
 
     if premier.baton != ():
@@ -385,14 +420,6 @@ def choix_lancer(x, y):
         game.up_prise()
 
 
-
-#     lancer(reponse, pitch[1])
-#
-#
-# def lancer(reponse, pitch):
-#
-
-
 # def frappe():
 #     game.resultat_frappe()
 
@@ -438,25 +465,24 @@ def resultat_presence(p):
             troisieme.clear_baton()
         else:
             troisieme.changer_baton(deuxieme.baton)
-            troisieme.baton.update_pos(125, -100)
+            troisieme.baton.update_pos(115, -100)
         if premier.baton == ():
             deuxieme.clear_baton()
         else:
             deuxieme.changer_baton(premier.baton)
-            deuxieme.baton.update_pos(-75, -300)
+            deuxieme.baton.update_pos(-85, -300)
         if marbre.baton == ():
             premier.clear_baton()
         else:
             premier.changer_baton(marbre.baton)
-            premier.baton.update_pos(-275, -100)
+            premier.baton.update_pos(-285, -100)
         marbre.clear_baton()
 
 
-
+    game.reset_prise()
     liste_frappeurs.insert(0, liste_frappeurs.pop())
 
     presence_bat()
-
 
 
 def resultat_partie():
@@ -465,21 +491,24 @@ def resultat_partie():
         arbi.w(f"{equipe_top.nom} ont gagnés!")
     if game.score[0] < game.score[1]:
         arbi.w(f"{equipe_bot.nom} ont gagnés!")
-    if game.score[0] > game.score[1]:
+    if game.score[0] == game.score[1]:
         arbi.w("Partie nulle! Tout le monde perd!!")
 
 
 #######################################################
 
+
 wn = turtle.Screen()
+wn.bgcolor("black")
 wn.addshape('arbi1.gif')
 wn.addshape('arbi2.gif')
 wn.addshape('jouer.gif')
 wn.addshape("joueur_bleu.gif")
 wn.addshape("joueur_rouge.gif")
 wn.addshape("bleu_baton.gif")
+wn.addshape("rouge_baton.gif")
 wn.addshape("rouge_champ.gif")
-wn.bgcolor("black")
+wn.addshape("bleu_champ.gif")
 
 balles_basses = [['Balle rapide!!', 2, 2]]
 balles_hautes = [['Balle rapide!!', 3, 3]]
@@ -492,9 +521,6 @@ premier = but(-200, -100)
 deuxieme = but(0, -300)
 troisieme = but(200, -100)
 monticule = but(0, -100)
-monticule.turtle.shape("circle")
-monticule.turtle.color("#805500")
-monticule.turtle.shapesize(stretch_wid=9, stretch_len=9)
 
 ligne1 = ligne(45, 200, -100)
 ligne2 = ligne(135, -200, -100)
