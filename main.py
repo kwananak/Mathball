@@ -7,24 +7,26 @@ import random
 from playsound import playsound
 
 
-#check copyright
-#envoyer joueurs au champ pour vrai
-#inputs simultanés
-#modèle joueurs
-#inputs val equipes/joueurs
-#background(s)
-#statistiques joueurs
-#incorporation web
-#timers sur input
-#liste des frappeurs = bancs des joueurs
-#affichage complet jumbotron
-#sons
-#problème du 6ieme frappeur
-#refaire basses/hautes + cartes événements
+# multijoueurs
+# timers sur input
+# envoyer joueurs au champ pour vrai
+# check copyright
+
+# inputs val equipes/joueurs
+# affichage complet jumbotron
+# liste des frappeurs = bancs des joueurs
+# statistiques joueurs
+# problème du 6ieme frappeur
+
+# modèle joueurs mouvement
+# background(s)
+# sons
+# refaire basses/hautes + cartes événements
 
 
-class joueur:
+class Joueur:
     all = []
+
     def __init__(self, nom, shape, num, x, y):
         self.tt = turtle.Turtle()
         self.tt.ht()
@@ -40,69 +42,70 @@ class joueur:
         self.num = num
         # self.numero = turtle.numinput(" ", "Numéro du joueur", 0, 1, 99)
 
-        joueur.all.append(self)
+        Joueur.all.append(self)
 
     def update_pos(self, x, y):
+        self.tt.shape(self.shape_init)
         self.tt.setpos(x, y)
         if x == -85 and y == 100:
             if game.top_bot:
                 self.tt.shape("bleu_baton.gif")
             else:
                 self.tt.shape("rouge_baton.gif")
-        else:
-            self.tt.shape(self.shape_init)
 
     def retour_banc(self):
         self.tt.shape(self.shape_init)
         self.tt.setpos(self.banc)
 
 
-class equipe:
+class Equipe:
     def __init__(self, top):
         self.liste_frappeurs = []
         if top:
             self.nom = "Les Bozos"
-            self.joueur1 = joueur('Mike', "joueur_bleu.gif", 97, -400, 330)
+            self.joueur1 = Joueur('Mike', "joueur_bleu.gif", 97, -400, 330)
             self.liste_frappeurs.append(self.joueur1)
-            self.joueur2 = joueur('Joey', "joueur_bleu.gif", 62, -400, 230)
+            self.joueur2 = Joueur('Joey', "joueur_bleu.gif", 62, -400, 230)
             self.liste_frappeurs.append(self.joueur2)
-            self.joueur3 = joueur('Igor', "joueur_bleu.gif", 8, -400, 130)
+            self.joueur3 = Joueur('Igor', "joueur_bleu.gif", 8, -400, 130)
             self.liste_frappeurs.append(self.joueur3)
-            self.joueur4 = joueur('Johanne', "joueur_bleu.gif", 21, -400, 30)
+            self.joueur4 = Joueur('Johanne', "joueur_bleu.gif", 21, -400, 30)
             self.liste_frappeurs.append(self.joueur4)
-            self.joueur5 = joueur('Galipette', "joueur_bleu.gif", 5, -400, -70)
+            self.joueur5 = Joueur('Galipette', "joueur_bleu.gif", 5, -400, -70)
             self.liste_frappeurs.append(self.joueur5)
         else:
             self.nom = "Les Nonos"
-            self.joueur1 = joueur('Sarah-Jeanne', "joueur_rouge.gif", 23, 400, 330)
+            self.joueur1 = Joueur('Sarah-Jeanne', "joueur_rouge.gif", 23, 400, 330)
             self.liste_frappeurs.append(self.joueur1)
-            self.joueur2 = joueur('Lucien', "joueur_rouge.gif", 78, 400, 230)
+            self.joueur2 = Joueur('Lucien', "joueur_rouge.gif", 78, 400, 230)
             self.liste_frappeurs.append(self.joueur2)
-            self.joueur3 = joueur('Jean-Rodrigue', "joueur_rouge.gif", 99, 400, 130)
+            self.joueur3 = Joueur('Jean-Rodrigue', "joueur_rouge.gif", 99, 400, 130)
             self.liste_frappeurs.append(self.joueur3)
-            self.joueur4 = joueur('Ishmaël', "joueur_rouge.gif", 16, 400, 30)
+            self.joueur4 = Joueur('Ishmaël', "joueur_rouge.gif", 16, 400, 30)
             self.liste_frappeurs.append(self.joueur4)
-            self.joueur5 = joueur('Gollum', "joueur_rouge.gif", 9, 400, -70)
+            self.joueur5 = Joueur('Gollum', "joueur_rouge.gif", 9, 400, -70)
             self.liste_frappeurs.append(self.joueur5)
 
     def rotation_frappeurs(self):
-        self.liste_frappeurs.insert(0, self.liste_frappeurs.pop())
+        self.liste_frappeurs.append(self.liste_frappeurs.pop(0))
 
     def pos_champ(self):
         pass
 
 
-class partie:
+class Partie:
     def __init__(self):
         self.manche = 1
         self.qt_manches = 0
         self.top_bot = True
-        self.score = [0,0]
+        self.score = [0, 0]
         self.retrait = 0
         self.prise = 0
         self.balle = 0
+        self.pitch = []
+        self.reponse = 0
 
-        self.ecran = jumbotron()
+        self.ecran = Jumbotron()
 
         self.btn_manches = turtle.Turtle()
         self.btn_manches.ht()
@@ -112,23 +115,18 @@ class partie:
         self.btn_manches.onclick(self.att_qt_manches)
 
     def att_qt_manches(self, x, y):
-        if x >= self.btn_manches.xcor() - 102 and x <= self.btn_manches.xcor() - 66:
+        if self.btn_manches.xcor() - 102 <= x <= self.btn_manches.xcor() - 66:
             self.qt_manches = 1
-        if x >= self.btn_manches.xcor() - 60 and x <= self.btn_manches.xcor() - 24:
+        if self.btn_manches.xcor() - 60 <= x <= self.btn_manches.xcor() - 24:
             self.qt_manches = 2
-        if x >= self.btn_manches.xcor() - 18 and x <= self.btn_manches.xcor() + 18:
+        if self.btn_manches.xcor() - 18 <= x <= self.btn_manches.xcor() + 18:
             self.qt_manches = 3
-        if x >= self.btn_manches.xcor() + 24 and x <= self.btn_manches.xcor() + 60:
+        if self.btn_manches.xcor() + 24 <= x <= self.btn_manches.xcor() + 60:
             self.qt_manches = 4
-        if x >= self.btn_manches.xcor() + 66 and x <= self.btn_manches.xcor() + 102:
+        if self.btn_manches.xcor() + 66 <= x <= self.btn_manches.xcor() + 102:
             self.qt_manches = 5
         self.btn_manches.ht()
         debut_partie()
-
-
-
-    def up_manche(self):
-        self.manches += 1
 
     def choix_lancer(self, x, y):
         btn_fac.tt.ht()
@@ -164,19 +162,24 @@ class partie:
                 b = random.randint(6, 9)
         self.reponse = a * b
         arbi.dial.write(f"{a} * {b}", False, 'right', ('Courier', 15, 'bold'))
-        if game.top_bot:
-            clav_bleu.delete()
-            clav_bleu.tt.st()
-        else:
-            clav_rouge.delete()
-            clav_rouge.tt.st()
+        clav_bleu.delete()
+        clav_bleu.tt.st()
+        clav_rouge.delete()
+        clav_rouge.tt.st()
 
-    def frappe(self, de_clav):
+    def frappe(self, de_clav, equipe):
         arbi.dial.clear()
+        print(de_clav, equipe, game.top_bot)
         if int(de_clav) == self.reponse:
-            resultat_presence(self.pitch[1])
+            if (game.top_bot and equipe == "bleu") or (not game.top_bot and equipe == "rouge"):
+                resultat_presence(self.pitch[1])
+            else:
+                game.up_prise()
         else:
-            game.up_prise()
+            if (game.top_bot and equipe == "bleu") or (not game.top_bot and equipe == "rouge"):
+                game.up_prise()
+            else:
+                resultat_presence(self.pitch[1])
 
     def up_score(self):
         if self.top_bot:
@@ -199,7 +202,6 @@ class partie:
                 arbi.w("Troisième prise!!")
                 self.up_retrait()
 
-
     def up_retrait(self):
         self.retrait += 1
         self.prise = 0
@@ -215,13 +217,12 @@ class partie:
         else:
             resultat_presence(0)
 
-
     def resultat_manche(self):
         premier.clear_baton()
         deuxieme.clear_baton()
         troisieme.clear_baton()
 
-        for i in joueur.all:
+        for i in Joueur.all:
             i.retour_banc()
 
         if self.top_bot:
@@ -239,7 +240,7 @@ class partie:
         self.prise = 0
 
 
-class but:
+class But:
     def __init__(self, x, y):
         self.turtle = turtle.Turtle()
         self.turtle.ht()
@@ -265,40 +266,43 @@ class but:
         self.champ = nouveau
 
 
-class ligne:
-    def __init__(self,r,x,y):
+class Ligne:
+    def __init__(self, r, x, y):
         self.turtle = turtle.Turtle()
         self.turtle.ht()
         self.turtle.color('white')
         self.turtle.speed(9)
         self.turtle.right(r)
         self.turtle.penup()
-        self.turtle.setpos(x,y)
+        self.turtle.setpos(x, y)
         self.turtle.pensize(6)
         self.turtle.pendown()
 
 
-class bouton:
-    def __init__(self, x, y, w, l, r, func, shape='square', color='white'):
+class Bouton:
+    def __init__(self, x, y, w, v, r, func, shape='square', color='white'):
         self.tt = turtle.Turtle()
         self.tt.ht()
         self.tt.up()
         self.tt.color(color)
         self.tt.shape(shape)
         self.tt.setpos(x, y)
-        self.tt.shapesize(stretch_wid=w, stretch_len=l)
+        self.tt.shapesize(stretch_wid=w, stretch_len=v)
         self.tt.onclick(func)
         self.tt.right(r)
 
 
-class clavier_num:
-    def __init__(self, x, y, shape):
+class ClavierNum:
+    all = []
+
+    def __init__(self, x, y, shape, equipe):
         self.tt = turtle.Turtle()
         self.tt.ht()
         self.tt.up()
         self.tt.shape(shape)
         self.tt.setpos(x, y)
         self.tt.onclick(self.click)
+        self.equipe = equipe
 
         self.reponse = ""
 
@@ -308,40 +312,42 @@ class clavier_num:
         self.ecran.color("white")
         self.ecran.setpos(x+50, y+40)
 
+        ClavierNum.all.append(self)
+
     def click(self, x, y):
-        if x >= self.tt.xcor() - 60 and x <= self.tt.xcor() - 25:
-            if y <= self.tt.ycor() + 35 and y >= self.tt.ycor():
+        if self.tt.xcor() - 60 <= x <= self.tt.xcor() - 25:
+            if self.tt.ycor() + 35 >= y >= self.tt.ycor():
                 self.update("1")
-            if y <= self.tt.ycor() - 6 and y >= self.tt.ycor() -42:
+            if self.tt.ycor() - 6 >= y >= self.tt.ycor() - 42:
                 self.update("4")
-            if y <= self.tt.ycor() - 48 and y >= self.tt.ycor() + -84:
+            if self.tt.ycor() - 48 >= y >= self.tt.ycor() - 84:
                 self.update("7")
-            if y <= self.tt.ycor() - 90 and y >= self.tt.ycor() -126:
+            if self.tt.ycor() - 90 >= y >= self.tt.ycor() - 126:
                 self.update("0")
-        if x >= self.tt.xcor() - 18 and x <= self.tt.xcor() + 18:
-            if y <= self.tt.ycor() + 35 and y >= self.tt.ycor():
+        if self.tt.xcor() - 18 <= x <= self.tt.xcor() + 18:
+            if self.tt.ycor() + 35 >= y >= self.tt.ycor():
                 self.update("2")
-            if y <= self.tt.ycor() - 6 and y >= self.tt.ycor() -42:
+            if self.tt.ycor() - 6 >= y >= self.tt.ycor() - 42:
                 self.update("5")
-            if y <= self.tt.ycor() - 48 and y >= self.tt.ycor() + -84:
+            if self.tt.ycor() - 48 >= y >= self.tt.ycor() - 84:
                 self.update("8")
-            if y <= self.tt.ycor() - 90 and y >= self.tt.ycor() -126:
+            if self.tt.ycor() - 90 >= y >= self.tt.ycor() - 126:
                 self.delete()
-        if x >= self.tt.xcor() + 25 and x <= self.tt.xcor() + 60:
-            if y <= self.tt.ycor() + 35 and y >= self.tt.ycor():
+        if self.tt.xcor() + 25 <= x <= self.tt.xcor() + 60:
+            if self.tt.ycor() + 35 >= y >= self.tt.ycor():
                 self.update("3")
-            if y <= self.tt.ycor() - 6 and y >= self.tt.ycor() -42:
+            if self.tt.ycor() - 6 >= y >= self.tt.ycor() - 42:
                 self.update("6")
-            if y <= self.tt.ycor() - 48 and y >= self.tt.ycor() + -84:
+            if self.tt.ycor() - 48 >= y >= self.tt.ycor() - 84:
                 self.update("9")
-            if y <= self.tt.ycor() - 90 and y >= self.tt.ycor() -126:
+            if self.tt.ycor() - 90 >= y >= self.tt.ycor() - 126:
                 if self.reponse == "":
                     pass
                 else:
                     self.ecran.clear()
-                    self.tt.ht()
-                    game.frappe(self.reponse)
-
+                    for i in ClavierNum.all:
+                        i.tt.ht()
+                    game.frappe(self.reponse, self.equipe)
 
     def update(self, n):
         if len(self.reponse) == 4:
@@ -350,13 +356,12 @@ class clavier_num:
         self.ecran.clear()
         self.ecran.write(self.reponse, False, 'right', ('System', 30, 'bold'))
 
-
     def delete(self):
         self.reponse = ""
         self.ecran.clear()
 
 
-class arbitre:
+class Arbitre:
     def __init__(self):
         self.pers = turtle.Turtle()
         self.pers.ht()
@@ -381,7 +386,7 @@ class arbitre:
         self.dial.clear()
 
 
-class jumbotron:
+class Jumbotron:
     def __init__(self):
         self.tt = turtle.Turtle()
         self.tt.ht()
@@ -432,13 +437,13 @@ def intro():
     btn_debut.tt.st()
 
 
-def nouv_part(x,y):
+def nouv_part(x, y):
     btn_debut.tt.ht()
     wn.bgcolor("#288722")
     wn.bgpic("back.gif")
     arbi.pers.st()
 
-    for i in joueur.all:
+    for i in Joueur.all:
         i.tt.st()
         time.sleep(0.1)
 
@@ -458,7 +463,7 @@ def debut_partie():
 
 
 def debut_manche():
-    global liste_frappeurs
+    nm_manche = ""
     if game.top_bot:
         stat_manche = 'Haut'
     else:
@@ -467,23 +472,23 @@ def debut_manche():
         nm_manche = 'l\'unique'
     elif game.manche == game.qt_manches:
         nm_manche = 'la dernière'
-    match game.manche:
-        case 1:
-            nm_manche = 'la première'
-        case 2:
-            nm_manche = 'la seconde'
-        case 3:
-            nm_manche = 'la troisième'
-        case 4:
-            nm_manche = 'la quatrième'
-        case 5:
-            nm_manche = 'la cinquième'
+    else:
+        match game.manche:
+            case 1:
+                nm_manche = 'la première'
+            case 2:
+                nm_manche = 'la seconde'
+            case 3:
+                nm_manche = 'la troisième'
+            case 4:
+                nm_manche = 'la quatrième'
+            case 5:
+                nm_manche = 'la cinquième'
 
     arbi.w(f'{stat_manche} de {nm_manche} manche')
 
     if game.top_bot:
         nom_baton = bleus.nom
-        liste_frappeurs = [bleus.joueur1, bleus.joueur5, bleus.joueur4, bleus.joueur3, bleus.joueur2]
         rouges.joueur1.update_pos(85, 100)
         rouges.joueur1.tt.shape("rouge_champ.gif")
         rouges.joueur2.update_pos(-115, -100)
@@ -497,7 +502,6 @@ def debut_manche():
 
     else:
         nom_baton = rouges.nom
-        liste_frappeurs = [rouges.joueur1, rouges.joueur5, rouges.joueur4, rouges.joueur3, rouges.joueur2]
         bleus.joueur1.update_pos(85, 100)
         bleus.joueur1.tt.shape("bleu_champ.gif")
         bleus.joueur2.update_pos(-115, -100)
@@ -508,7 +512,6 @@ def debut_manche():
         bleus.joueur4.tt.shape("bleu_champ.gif")
         bleus.joueur5.update_pos(0, -70)
         bleus.joueur5.tt.shape("bleu_champ.gif")
-
 
     arbi.w(f'{nom_baton} sont au bâton')
 
@@ -521,7 +524,6 @@ def presence_bat():
     else:
         marbre.changer_baton(rouges.liste_frappeurs[0])
     marbre.baton.update_pos(-85, 100)
-
 
     if premier.baton != ():
         arbi.w(f'{premier.baton.nom} est au premier')
@@ -596,55 +598,67 @@ def resultat_partie():
     if game.score[0] == game.score[1]:
         arbi.w("Partie nulle! Tout le monde perd!!")
 
+    btn_debut.tt.st()
+
 
 #######################################################
 
 
-wn = turtle.Screen()
-wn.bgcolor("black")
-load = turtle.Turtle()
-load.ht()
-load.color("white")
-load.write("loading...", False, 'center', ('Courier', 15, 'bold'))
+if __name__ == "__main__":
+    wn = turtle.Screen()
+    wn.bgcolor("black")
+    wn.title("Mathball")
+    load = turtle.Turtle()
+    load.ht()
+    load.color("white")
+    load.write("loading...", False, 'center', ('Courier', 15, 'bold'))
 
-wn.addshape('arbi1.gif')
-wn.addshape('arbi2.gif')
-wn.addshape('jouer.gif')
-wn.addshape("joueur_bleu.gif")
-wn.addshape("joueur_rouge.gif")
-wn.addshape("bleu_baton.gif")
-wn.addshape("rouge_baton.gif")
-wn.addshape("rouge_champ.gif")
-wn.addshape("bleu_champ.gif")
-wn.addshape("rouge_clav.gif")
-wn.addshape("bleu_clav.gif")
-wn.addshape("btn_manches.gif")
+    sprites = [
+        "joueur_bleu.gif",
+        "arbi2.gif",
+        "jouer.gif",
+        "arbi1.gif",
+        "joueur_rouge.gif",
+        "bleu_baton.gif",
+        "rouge_baton.gif",
+        "rouge_champ.gif",
+        "bleu_champ.gif",
+        "rouge_clav.gif",
+        "bleu_clav.gif",
+        "btn_manches.gif"]
 
-balles_basses = [('Balle rapide!!', 2, 2)]
-balles_hautes = [('Balle rapide!!', 3, 3)]
+    for s in sprites:
+        wn.addshape(s)
 
-bleus = equipe(True)
-rouges = equipe(False)
+    balles_basses = [
+        ('Balle rapide!!', 2, 2),
+        ]
+    balles_hautes = [
+        ('Balle rapide!!', 3, 3),
+        ]
 
-marbre = but(0, 100)
-premier = but(-200, -100)
-deuxieme = but(0, -300)
-troisieme = but(200, -100)
-monticule = but(0, -100)
+    bleus = Equipe(True)
+    rouges = Equipe(False)
 
-ligne1 = ligne(45, 200, -100)
-ligne2 = ligne(135, -200, -100)
+    marbre = But(0, 100)
+    premier = But(-200, -100)
+    deuxieme = But(0, -300)
+    troisieme = But(200, -100)
+    monticule = But(0, -100)
 
-game = partie()
+    ligne1 = Ligne(45, 200, -100)
+    ligne2 = Ligne(135, -200, -100)
 
-clav_bleu = clavier_num(-200, 200, "bleu_clav.gif")
-clav_rouge = clavier_num(200, 200, "rouge_clav.gif")
-btn_debut = bouton(0,-100,2,4,0, nouv_part, "jouer.gif")
-btn_fac = bouton(-50,-80, 3, 5, 90, game.choix_lancer, 'arrow')
-btn_dif = bouton(50,-120, 3, 5, 270, game.choix_lancer, 'arrow')
-arbi = arbitre()
+    game = Partie()
 
-load.clear()
-intro()
+    clav_bleu = ClavierNum(-200, 200, "bleu_clav.gif", "bleu")
+    clav_rouge = ClavierNum(200, 200, "rouge_clav.gif", "rouge")
+    btn_debut = Bouton(0, -100, 2, 4, 0, nouv_part, "jouer.gif")
+    btn_fac = Bouton(-50, -80, 3, 5, 90, game.choix_lancer, 'arrow')
+    btn_dif = Bouton(50, -120, 3, 5, 270, game.choix_lancer, 'arrow')
+    arbi = Arbitre()
 
-turtle.done()
+    load.clear()
+    intro()
+
+    turtle.done()
