@@ -5,9 +5,12 @@ import turtle
 import time
 import random
 from playsound import playsound
+import socket
+import select
+import errno
+import sys
 
-
-# multijoueurs
+# transférer partie sur serveur
 # timers sur input
 # envoyer joueurs au champ pour vrai
 # check copyright
@@ -18,10 +21,12 @@ from playsound import playsound
 # statistiques joueurs
 # problème du 6ieme frappeur
 
-# modèle joueurs mouvement
-# background(s)
 # sons
+# refaire arbitre
+# animations + variété joueurs & backgrounds
 # refaire basses/hautes + cartes événements
+# signes catcheur
+
 
 
 class Joueur:
@@ -104,28 +109,30 @@ class Partie:
         self.balle = 0
         self.pitch = []
         self.reponse = 0
+        self.equipe_top = True
 
         self.ecran = Jumbotron()
+        self.a = 0
+        self.b = 0
 
         self.btn_manches = turtle.Turtle()
         self.btn_manches.ht()
         self.btn_manches.up()
         self.btn_manches.setpos(0, -100)
         self.btn_manches.shape("btn_manches.gif")
-        self.btn_manches.onclick(self.att_qt_manches)
+        self.btn_manches.onclick(choix_manches)
 
-    def att_qt_manches(self, x, y):
-        if self.btn_manches.xcor() - 102 <= x <= self.btn_manches.xcor() - 66:
-            self.qt_manches = 1
-        if self.btn_manches.xcor() - 60 <= x <= self.btn_manches.xcor() - 24:
-            self.qt_manches = 2
-        if self.btn_manches.xcor() - 18 <= x <= self.btn_manches.xcor() + 18:
-            self.qt_manches = 3
-        if self.btn_manches.xcor() + 24 <= x <= self.btn_manches.xcor() + 60:
-            self.qt_manches = 4
-        if self.btn_manches.xcor() + 66 <= x <= self.btn_manches.xcor() + 102:
-            self.qt_manches = 5
-        self.btn_manches.ht()
+    def update_reponse(self, a):
+        self.reponse = a
+
+    def update_pitch(self, a, b):
+        self.pitch = [a, b]
+
+    def flip_equipe_top(self):
+        self.equipe_top = False
+
+    def att_qt_manches(self, arg):
+        self.qt_manches = arg
         debut_partie()
 
     def choix_lancer(self, x, y):
@@ -135,50 +142,80 @@ class Partie:
         if x < 0:
             n = random.randint(1, 6)
             if n == 1:
-                arbi.w(balles_basses[0][0])
+                # arbi.w(balles_basses[0][0])
                 self.pitch = balles_basses[0][1:]
             else:
                 self.pitch = [1, 1]
         else:
             n = random.randint(1, 6)
             if n == 1:
-                arbi.w(balles_hautes[0][0])
+                # arbi.w(balles_hautes[0][0])
                 self.pitch = balles_hautes[0][1:]
             else:
                 self.pitch = [2, 2]
 
         match self.pitch[0]:
             case 0:
-                a = random.randint(2, 5)
-                b = random.randint(2, 5)
+                self.a = random.randint(2, 5)
+                self.b = random.randint(2, 5)
             case 1:
-                a = random.randint(3, 8)
-                b = random.randint(3, 8)
+                self.a = random.randint(3, 8)
+                self.b = random.randint(3, 8)
             case 2:
-                a = random.randint(9, 12)
-                b = random.randint(9, 12)
+                self.a = random.randint(9, 12)
+                self.b = random.randint(9, 12)
             case 3:
-                a = random.randint(6, 9)
-                b = random.randint(6, 9)
-        self.reponse = a * b
-        arbi.dial.write(f"{a} * {b}", False, 'right', ('Courier', 15, 'bold'))
-        clav_bleu.delete()
-        clav_bleu.tt.st()
-        clav_rouge.delete()
-        clav_rouge.tt.st()
+                self.a = random.randint(6, 9)
+                self.b = random.randint(6, 9)
+        self.reponse = self.a * self.b
+
+        message = (f"lancer, {self.a}, {self.b}, {self.reponse}, {self.pitch[1]}").encode("utf-8")
+
+        client_socket.send(message)
+
+        while True:
+            try:
+                while True:
+                    retour = client_socket.recv(1024).decode("utf-8")
+                    if retour[:6] == "lancer":
+                        self.deux_partie_lanc(retour[8:])
+                        break
+            except IOError as e:
+                if e.errno != errno.EAGAIN and e.errno != errno.EWOULDBLOCK:
+                    print("reading error", str(e))
+                    sys.exit()
+                continue
+            break
+
+    def deux_partie_lanc(self, lancer):
+        print(lancer)
+        lance = lancer.split(",")
+        self.update_pitch(int(lance[2]), int(lance[3]))
+        self.update_reponse(int(lance[0]) * int(lance[1]))
+        arbi.dial.write(f"{lance[0]} * {lance[1]}", False, 'right', ('Courier', 15, 'bold'))
+        if self.equipe_top:
+            clav_bleu.delete()
+            clav_bleu.tt.st()
+        else:
+            clav_rouge.delete()
+            clav_rouge.tt.st()
 
     def frappe(self, de_clav, equipe):
         arbi.dial.clear()
-        print(de_clav, equipe, game.top_bot)
+        print(equipe)
         if int(de_clav) == self.reponse:
             if (game.top_bot and equipe == "bleu") or (not game.top_bot and equipe == "rouge"):
+                print("a")
                 resultat_presence(self.pitch[1])
-            else:
+            if (game.top_bot and equipe == "rouge") or (not game.top_bot and equipe == "bleu"):
+                print("b")
                 game.up_prise()
         else:
             if (game.top_bot and equipe == "bleu") or (not game.top_bot and equipe == "rouge"):
+                print("c")
                 game.up_prise()
-            else:
+            if (game.top_bot and equipe == "rouge") or (not game.top_bot and equipe == "bleu"):
+                print("d")
                 resultat_presence(self.pitch[1])
 
     def up_score(self):
@@ -347,7 +384,27 @@ class ClavierNum:
                     self.ecran.clear()
                     for i in ClavierNum.all:
                         i.tt.ht()
-                    game.frappe(self.reponse, self.equipe)
+
+                    message = (f"frappe,{self.reponse},{self.equipe}").encode("utf-8")
+                    client_socket.send(message)
+
+                    while True:
+                        try:
+                            while True:
+                                retour = client_socket.recv(1024).decode("utf-8")
+                                if retour[:6] == "frappe":
+                                    r = retour[7:]
+                                    r = r.split(",")
+                                    print(r)
+                                    game.frappe(r[0], r[1])
+                                    break
+                        except IOError as e:
+                            if e.errno != errno.EAGAIN and e.errno != errno.EWOULDBLOCK:
+                                print("reading error", str(e))
+                                sys.exit()
+                            continue
+                        break
+
 
     def update(self, n):
         if len(self.reponse) == 4:
@@ -439,6 +496,26 @@ def intro():
 
 def nouv_part(x, y):
     btn_debut.tt.ht()
+
+    message = "jouer"
+    client_socket.send(message.encode("utf-8"))
+
+    while True:
+        try:
+            while True:
+                retour = client_socket.recv(1024).decode("utf-8")
+                if retour == "commencer":
+                    cont_partie()
+                    break
+        except IOError as e:
+            if e.errno != errno.EAGAIN and e.errno != errno.EWOULDBLOCK:
+                print("reading error", str(e))
+                sys.exit()
+            continue
+        break
+
+
+def cont_partie():
     wn.bgcolor("#288722")
     wn.bgpic("back.gif")
     arbi.pers.st()
@@ -449,6 +526,36 @@ def nouv_part(x, y):
 
     arbi.w('Combien de manches?')
     game.btn_manches.st()
+
+
+def choix_manches(x,y):
+    if game.btn_manches.xcor() - 102 <= x <= game.btn_manches.xcor() - 66:
+        qt_manches = 1
+    if game.btn_manches.xcor() - 60 <= x <= game.btn_manches.xcor() - 24:
+        qt_manches = 2
+    if game.btn_manches.xcor() - 18 <= x <= game.btn_manches.xcor() + 18:
+        qt_manches = 3
+    if game.btn_manches.xcor() + 24 <= x <= game.btn_manches.xcor() + 60:
+        qt_manches = 4
+    if game.btn_manches.xcor() + 66 <= x <= game.btn_manches.xcor() + 102:
+        qt_manches = 5
+    game.btn_manches.ht()
+
+    client_socket.send(str(qt_manches).encode("utf-8"))
+
+    while True:
+        try:
+            while True:
+                retour = client_socket.recv(1024).decode("utf-8")
+                if retour:
+                    game.att_qt_manches(int(retour))
+                    break
+        except IOError as e:
+            if e.errno != errno.EAGAIN and e.errno != errno.EWOULDBLOCK:
+                print("reading error", str(e))
+                sys.exit()
+            continue
+        break
 
 
 def debut_partie():
@@ -538,8 +645,24 @@ def presence_bat():
     if game.retrait == 2:
         arbi.w('Deux retraits')
     arbi.w('Choix de lancer')
-    btn_fac.tt.st()
-    btn_dif.tt.st()
+
+    if (game.top_bot and not game.equipe_top) or (not game.top_bot and game.equipe_top):
+        btn_fac.tt.st()
+        btn_dif.tt.st()
+    else:
+        while True:
+            try:
+                while True:
+                    retour = client_socket.recv(1024).decode("utf-8")
+                    if retour[:6] == "lancer":
+                        game.deux_partie_lanc(retour[8:])
+                        break
+            except IOError as e:
+                if e.errno != errno.EAGAIN and e.errno != errno.EWOULDBLOCK:
+                    print("reading error", str(e))
+                    sys.exit()
+                continue
+            break
 
 
 def resultat_presence(p):
@@ -605,6 +728,15 @@ def resultat_partie():
 
 
 if __name__ == "__main__":
+
+    IP = "127.0.0.1"
+    PORT = 1234
+
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((IP, PORT))
+    client_socket.setblocking(False)
+
+
     wn = turtle.Screen()
     wn.bgcolor("black")
     wn.title("Mathball")
@@ -650,6 +782,22 @@ if __name__ == "__main__":
     ligne2 = Ligne(135, -200, -100)
 
     game = Partie()
+
+    while True:
+        try:
+            while True:
+                retour = client_socket.recv(1024).decode("utf-8")
+                if retour == "flip":
+                    game.flip_equipe_top()
+                    break
+                if retour == "flop":
+                    break
+        except IOError as e:
+            if e.errno != errno.EAGAIN and e.errno != errno.EWOULDBLOCK:
+                print("reading error", str(e))
+                sys.exit()
+            continue
+        break
 
     clav_bleu = ClavierNum(-200, 200, "bleu_clav.gif", "bleu")
     clav_rouge = ClavierNum(200, 200, "rouge_clav.gif", "rouge")
